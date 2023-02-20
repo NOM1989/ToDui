@@ -1,4 +1,4 @@
-module example.com/todo
+module example.com/todui
 
 go 1.20
 
