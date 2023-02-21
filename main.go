@@ -9,11 +9,13 @@ import (
 )
 
 var (
-	to_do_filename = "/home/NOM/todo.txt"
+	// to_do_filename = "/home/NOM/todo.txt"
+	to_do_filename = "/home/NOM/Code/Go/ToDui/list.txt"
 )
 
 type model struct {
 	cursor   int
+	mode     string
 	items    []string
 	selected map[int]struct{}
 }
@@ -65,12 +67,28 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 			}
 			return m, tea.Quit
+		case "e":
+			if m.mode == "" {
+				m.mode = "edit"
+			} else {
+				m.mode = ""
+			}
 		case "up", "k":
 			if m.cursor > 0 {
+				if m.mode == "edit" {
+					tmp_item := m.items[m.cursor]
+					m.items[m.cursor] = m.items[m.cursor-1]
+					m.items[m.cursor-1] = tmp_item
+				}
 				m.cursor--
 			}
 		case "down", "j":
 			if m.cursor < len(m.items)-1 {
+				if m.mode == "edit" {
+					tmp_item := m.items[m.cursor]
+					m.items[m.cursor] = m.items[m.cursor+1]
+					m.items[m.cursor+1] = tmp_item
+				}
 				m.cursor++
 			}
 		case "enter", " ":
@@ -87,12 +105,16 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m model) View() string {
-	s := "Your to-do list:\n\n"
+	s := m.mode + fmt.Sprint(m.cursor) + "Your to-do list:\n\n"
 
 	for i, choice := range m.items {
 		cursor := " "
 		if m.cursor == i {
-			cursor = ">"
+			if m.mode == "edit" {
+				cursor = " >"
+			} else {
+				cursor = ">"
+			}
 		}
 
 		checked := " "
